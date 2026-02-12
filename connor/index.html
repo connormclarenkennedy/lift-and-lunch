@@ -578,31 +578,73 @@
 </div>
 
 
+
 <script>
 (function() {
+    // Config check - disable Lift & Lunch if full
     fetch('config.json?' + Date.now())
         .then(r => r.json())
         .then(cfg => {
             if (cfg.liftLunchFull) {
                 const llOpt = document.querySelector('input[value="lift_and_lunch"]');
                 const llLabel = llOpt.closest('.opt');
-                llLabel.classList.add('opt-full');
+                llLabel.classList.add('disabled-option');
                 llOpt.disabled = true;
-                if (llOpt.checked) {
-                    llOpt.checked = false;
-                    document.querySelector('input[value="day_pass"]').checked = true;
+
+                const dpOpt = document.querySelector('input[value="day_pass"]');
+                dpOpt.checked = true;
+
+                let tag = llLabel.querySelector('.sold-out-tag');
+                if (!tag) {
+                    tag = document.createElement('span');
+                    tag.className = 'sold-out-tag';
+                    tag.textContent = 'SOLD OUT';
+                    llLabel.querySelector('.opt-info').appendChild(tag);
                 }
             }
         })
         .catch(() => {});
-})();
-</script>
 
-<script>
+    // Form submission
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
         e.preventDefault();
         if (!this.checkValidity()) { this.reportValidity(); return; }
 
         const data = {
             fullName:   document.getElementById('fullName').value.trim(),
-            email:      document.getElementBy
+            email:      document.getElementById('email').value.trim(),
+            phone:      document.getElementById('phone').value.trim(),
+            workplace:  document.getElementById('workplace').value.trim(),
+            attendance: document.querySelector('input[name="attendance"]:checked').value
+        };
+
+        const btn = document.querySelector('.submit-btn');
+        btn.textContent = 'SUBMITTING...';
+        btn.disabled = true;
+
+        fetch('https://default29ee786ca6cb44f5b08a07831568d4.f7.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5717d98bf504ed48d6866ae881c7152/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FZbbN4DvpRlYHtOlY6pcJq5PFQzuDEwxjSvYuLcIGOQ', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            document.querySelector('.main-content').style.display = 'none';
+            if (data.attendance === 'lift_and_lunch') {
+                document.getElementById('successLiftLunch').classList.add('show');
+            } else {
+                document.getElementById('successDayPass').classList.add('show');
+            }
+        })
+        .catch(() => {
+            document.querySelector('.main-content').style.display = 'none';
+            if (data.attendance === 'lift_and_lunch') {
+                document.getElementById('successLiftLunch').classList.add('show');
+            } else {
+                document.getElementById('successDayPass').classList.add('show');
+            }
+        });
+    });
+})();
+</script>
+</body>
+</html>
