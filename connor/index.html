@@ -618,21 +618,27 @@
             attendance: document.querySelector('input[name="attendance"]:checked').value
         };
 
-        // Fire the request (don't wait for response)
-        fetch('https://default29ee786ca6cb44f5b08a07831568d4.f7.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5717d98bf504ed48d6866ae881c7152/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FZbbN4DvpRlYHtOlY6pcJq5PFQzuDEwxjSvYuLcIGOQ', {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(data)
-        });
+        var btn = document.querySelector('.submit-btn');
+        btn.textContent = 'SUBMITTING...';
+        btn.disabled = true;
 
-        // Show confirmation immediately
-        document.querySelector('.main-content').style.display = 'none';
-        if (data.attendance === 'lift_and_lunch') {
-            document.getElementById('successLiftLunch').classList.add('show');
-        } else {
-            document.getElementById('successDayPass').classList.add('show');
-        }
+        var showConfirmation = function() {
+            document.querySelector('.main-content').style.display = 'none';
+            if (data.attendance === 'lift_and_lunch') {
+                document.getElementById('successLiftLunch').classList.add('show');
+            } else {
+                document.getElementById('successDayPass').classList.add('show');
+            }
+        };
+
+        // Show confirmation after 2 seconds regardless of response
+        setTimeout(showConfirmation, 2000);
+
+        // Send data to Power Automate
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://default29ee786ca6cb44f5b08a07831568d4.f7.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5717d98bf504ed48d6866ae881c7152/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FZbbN4DvpRlYHtOlY6pcJq5PFQzuDEwxjSvYuLcIGOQ');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(data));
     });
 })();
 </script>
