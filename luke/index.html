@@ -618,31 +618,21 @@
             attendance: document.querySelector('input[name="attendance"]:checked').value
         };
 
-        const btn = document.querySelector('.submit-btn');
-        btn.textContent = 'SUBMITTING...';
-        btn.disabled = true;
-
+        // Fire the request (don't wait for response)
         fetch('https://default29ee786ca6cb44f5b08a07831568d4.f7.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5717d98bf504ed48d6866ae881c7152/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FZbbN4DvpRlYHtOlY6pcJq5PFQzuDEwxjSvYuLcIGOQ', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(data)
-        })
-        .then(() => {
-            document.querySelector('.main-content').style.display = 'none';
-            if (data.attendance === 'lift_and_lunch') {
-                document.getElementById('successLiftLunch').classList.add('show');
-            } else {
-                document.getElementById('successDayPass').classList.add('show');
-            }
-        })
-        .catch(() => {
-            document.querySelector('.main-content').style.display = 'none';
-            if (data.attendance === 'lift_and_lunch') {
-                document.getElementById('successLiftLunch').classList.add('show');
-            } else {
-                document.getElementById('successDayPass').classList.add('show');
-            }
         });
+
+        // Show confirmation immediately
+        document.querySelector('.main-content').style.display = 'none';
+        if (data.attendance === 'lift_and_lunch') {
+            document.getElementById('successLiftLunch').classList.add('show');
+        } else {
+            document.getElementById('successDayPass').classList.add('show');
+        }
     });
 })();
 </script>
