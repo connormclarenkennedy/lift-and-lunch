@@ -1,4 +1,4 @@
 {
-  "liftLunchFull": true
-  "dayPassOpen": true
+  "liftLunchFull": false
+  "dayPassOpen": false
 }
